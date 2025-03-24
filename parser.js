@@ -106,6 +106,62 @@ console.log(tokenizer.nextToken()); // '}'
 
 class Parser {
   constructor(input) {
-    this.input 
+    this.tokenizer = new Tokenizer(input);
+    this.currentToken = this.tokenizer.nextToken();
+  }
+
+  // consume the current token and move to the next
+  consume(expected) {
+    if(this.currentToken !== expected) {
+      throw new Error (`Expected ${expected}, got ${this.currentToken}`);
+    }
+    this.currentToken = this.tokenizer.nextToken();
+  };
+
+
+  // Parse the enitre JSON
+  parse() {
+    const result = this.parseValue();
+    if(this.currentToken !== null) {
+      throw new Error(`Unexpected tokens after end`);
+    }
+    return result;
+  }
+
+  // Parse any JSON Value
+  parseValue() {
+    if(this.currentToken === '{') return this.parseObject();
+    if(this.currentToken === '[') return this.parseArray();
+    if(typeof this.currentToken === 'string') {
+      const value = this.currentToken;
+      this.currentToken = this.tokenizer.nextToken();
+      return value;
+    }
+    if(typeof this.currentToken === 'number' || typeof this.currentToken === 'boolean' ||
+      typeof this.currentToken === null) {
+        const value = this.currentToken;
+        this.currentToken = this.tokenizer.nextToken();
+        return value;
+      }
+      throw new Error(`Unexpected token: ${this.currentToken}`);
+  };
+
+
+  // Parse an Object
+  parseObject() {
+    const result = {};
+    this.consume('{');
+
+    while(this.currentToken !== '}') {
+      const key = this.currentToken;
+      if(typeof key !== 'string') throw new Error ('Object key must be a string');
+      this.consume(key);
+      this.consume(':');
+      const value = this.parseValue();
+      result[key] = value;
+      if(this.currentToken === ',') this.consume(',');
+    } 
+    this.consume('}');
+    return result;
   }
 }
