@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSON Parser</title>
+</head>
+<body>
+  <textarea id="input" rows="10" cols="50">{"name": "Alice"}</textarea>
+  <button onclick="parseJSON()">Parse</button>
+  <pre id="output"></pre>
+  <script src="parser.js"></script>
+  <script>
+    function parseJSON() {
+      const input = document.getElementById('input').value;
+      try {
+        const parser = new Parser(input);
+        const result = parser.parse();
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+      } catch (e) {
+        document.getElementById('output').textContent = 'Error: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>

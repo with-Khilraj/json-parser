@@ -163,5 +163,26 @@ class Parser {
     } 
     this.consume('}');
     return result;
+  };
+
+
+  // Parse an Array
+  parseArray() {
+    const result = [];
+    this.consume('[');
+
+    while(this.currentToken !== ']') {
+      const value = this.parseValue();
+      result.push(value);
+      if(this.currentToken === ',') this.consume(',');
+    }
+    this.consume(']');
+    return result;
   }
-}
+};
+
+const parser = new Parser('{"name": "Alice", "age": 30}');
+console.log(parser.parse()); // { name: 'Alice', age: 30 }
+
+const parser2 = new Parser('[1, 2, {"key": true}]');
+console.log(parser2.parse()); // [1, 2, { key: true }]
