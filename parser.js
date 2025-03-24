@@ -27,7 +27,11 @@ class Tokenizer {
     if (this.isDigit(char) || char === '-') return this.parseNumber();
 
     // Handle keywords (true, false, null)
-    if (this.isLetter(char)) return this.parseKeyword();
+    if (this.isLetter(char)) {
+      const word = this.parseKeyword();
+      if(word === true || word === false || word === null) return word;
+      throw new Error(`Invalid token: "${word}". Keys must be quoted strings.`)
+    }
 
     throw new Error(`Unexpected character: ${char} at position ${this.index}`);
   }
@@ -53,11 +57,15 @@ class Tokenizer {
       if (this.input[this.index] === '\\') {
         // Skip backslash
         this.index++; 
+        if(this.index >= this.input.length) throw new Error('Unclosed string after escape');
         result += this.input[this.index];
       } else {
         result += this.input[this.index];
       }
       this.index++;
+    }
+    if(this.index >= this.input.length) {
+      throw new Error(`Unclosed string starting at position ${this.index - result.length - 1}.`);
     }
     // Skip closing quote
     this.index++; 
@@ -84,7 +92,7 @@ class Tokenizer {
     if (result === 'true') return true;
     if (result === 'false') return false;
     if (result === 'null') return null;
-    throw new Error(`Unknown keyword: ${result}`);
+    return result;
   }
 
   isDigit(char) {
@@ -96,12 +104,12 @@ class Tokenizer {
   }
 };
 
-const tokenizer = new Tokenizer('{"name": "Alice"}');
-console.log(tokenizer.nextToken()); // '{'
-console.log(tokenizer.nextToken()); // 'name'
-console.log(tokenizer.nextToken()); // ':'
-console.log(tokenizer.nextToken()); // 'Alice'
-console.log(tokenizer.nextToken()); // '}'
+// const tokenizer = new Tokenizer('{"name": "Alice"}');
+// console.log(tokenizer.nextToken()); // '{'
+// console.log(tokenizer.nextToken()); // 'name'
+// console.log(tokenizer.nextToken()); // ':'
+// console.log(tokenizer.nextToken()); // 'Alice'
+// console.log(tokenizer.nextToken()); // '}'
 
 
 class Parser {
@@ -181,8 +189,11 @@ class Parser {
   }
 };
 
-const parser = new Parser('{"name": "Alice", "age": 30}');
-console.log(parser.parse()); // { name: 'Alice', age: 30 }
+// const parser = new Parser('{"name": "Alice", "age": 30}');
+// console.log(parser.parse()); // { name: 'Alice', age: 30 }
 
-const parser2 = new Parser('[1, 2, {"key": true}]');
-console.log(parser2.parse()); // [1, 2, { key: true }]
+// const parser2 = new Parser('{"a": [1, {"b": false}]}');
+// console.log(parser2.parse()); 
+
+// const parser3 = new Parser('{"key": "value"}, "unclosed');
+// console.log(parser3.parse()); 
