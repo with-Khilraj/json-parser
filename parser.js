@@ -104,12 +104,6 @@ class Tokenizer {
   }
 };
 
-// const tokenizer = new Tokenizer('{"name": "Alice"}');
-// console.log(tokenizer.nextToken()); // '{'
-// console.log(tokenizer.nextToken()); // 'name'
-// console.log(tokenizer.nextToken()); // ':'
-// console.log(tokenizer.nextToken()); // 'Alice'
-// console.log(tokenizer.nextToken()); // '}'
 
 
 class Parser {
@@ -146,11 +140,11 @@ class Parser {
       return value;
     }
     if(typeof this.currentToken === 'number' || typeof this.currentToken === 'boolean' ||
-      typeof this.currentToken === null) {
+      this.currentToken === null) {
         const value = this.currentToken;
         this.currentToken = this.tokenizer.nextToken();
         return value;
-      }
+    }
       throw new Error(`Unexpected token: ${this.currentToken}`);
   };
 
@@ -189,11 +183,6 @@ class Parser {
   }
 };
 
-// const parser = new Parser('{"name": "Alice", "age": 30}');
-// console.log(parser.parse()); // { name: 'Alice', age: 30 }
 
-// const parser2 = new Parser('{"a": [1, {"b": false}]}');
-// console.log(parser2.parse()); 
+module.exports = { Tokenizer, Parser };
 
-// const parser3 = new Parser('{"key": "value"}, "unclosed');
-// console.log(parser3.parse()); 
